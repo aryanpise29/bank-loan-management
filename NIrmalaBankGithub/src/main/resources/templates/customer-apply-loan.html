@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apply for Loan - Nirmala Bank</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #0b2a6b;
+      --secondary-color: #4f5b7d;
+      --background-color: #f8f9fa;
+      --border-color: #e9ecef;
+      --text-dark: #212529;
+      --text-light: #f8f9fa;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-dark);
+    }
+    .topbar {
+      background-color: var(--primary-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .topbar .navbar-brand {
+      color: var(--text-light);
+      transition: color 0.2s;
+    }
+    .topbar .navbar-brand:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .hamburger-menu {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      margin-right: 1rem;
+      transition: color 0.2s;
+    }
+    .hamburger-menu:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .sidebar {
+      min-height: 100vh;
+      background: #fff;
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      top: 56px;
+      left: -240px;
+      width: 240px;
+      padding-top: 2rem;
+      z-index: 1000;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+      transition: left 0.3s ease-in-out;
+    }
+    .sidebar.show {
+      left: 0;
+    }
+    .sidebar .nav-item {
+      padding: 0 1rem;
+    }
+    .sidebar .nav-link {
+      color: var(--secondary-color);
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      transition: background 0.2s, color 0.2s, font-weight 0.2s;
+      padding: 0.75rem 1rem;
+    }
+    .sidebar .nav-link.active,
+    .sidebar .nav-link:hover {
+      background: rgba(13, 110, 253, 0.1);
+      color: #0d6efd;
+      font-weight: 600;
+    }
+    .main-content {
+      margin-left: 0;
+      padding-top: 80px;
+      min-height: calc(100vh - 80px);
+      transition: margin-left 0.3s ease-in-out;
+    }
+    .main-content.shifted {
+      margin-left: 240px;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    }
+    .overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .card {
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+    }
+    .product-info {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+    .product-info.active {
+      display: block;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <nav class="navbar navbar-expand shadow-sm sticky-top topbar">
+    <div class="container-fluid">
+      <button class="hamburger-menu" id="hamburgerBtn">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand fw-semibold" href="#">NIRMALA BANK</a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <div class="dropdown" style="margin-right: 30px;">
+          <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="profileMenu" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle fs-3 text-white me-2"></i>
+            <span class="d-none d-sm-inline text-white me-2">Profile</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" th:href="@{/customer/profile}">View Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="dropdown-item">Sign out</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="overlay" id="overlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/dashboard}"><i class="bi bi-house-door me-2"></i>Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" th:href="@{/customer/apply-loan}"><i class="bi bi-cash-coin me-2"></i>Apply Loans</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/my-loans}"><i class="bi bi-card-checklist me-2"></i>View Loans</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/repayments}"><i class="bi bi-credit-card me-2"></i>Repayments</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/report}"><i class="bi bi-file-text me-2"></i>Report</a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="main-content py-3" id="mainContent">
+    <div class="container-fluid py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card card-hover shadow-sm rounded-4 border-0">
+            <div class="card-body p-4">
+              <h2 class="card-title mb-4 fw-bold">Apply for Loan</h2>
+              
+              <div th:if="${param.applied}" class="alert alert-success">
+                <i class="bi bi-check-circle me-2"></i>Loan application submitted successfully!
+              </div>
+              
+              <div th:if="${param.error}" class="alert alert-danger">
+                <i class="bi bi-exclamation-circle me-2"></i>Failed to submit application. Please try again.
+              </div>
+              
+              <div th:if="${customer.kycStatus.name() == 'PENDING'}" class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>Your KYC is not verified yet. Please wait for admin approval before applying for loans.
+              </div>
+              
+              <form th:action="@{/customer/apply-loan}" method="post" th:object="${application}" onsubmit="return validateForm()">
+                <div class="mb-3">
+                  <label for="loanProductId" class="form-label fw-semibold">Select Loan Product *</label>
+                  <select id="loanProductId" class="form-select" th:field="*{loanProductId}" required onchange="showProductInfo(this)">
+                    <option value="">-- Choose a loan product --</option>
+                    <option th:each="product : ${products}" 
+                            th:value="${product.loanProductId}"
+                            th:text="${product.productName}"
+                            th:attr="data-rate=${product.interestRate}, data-min=${product.minAmount}, data-max=${product.maxAmount}">
+                    </option>
+                  </select>
+                  <div id="productInfo" class="product-info">
+                    <p class="mb-1"><strong>Interest Rate:</strong> <span id="rate"></span>%</p>
+                    <p class="mb-0"><strong>Amount Range:</strong> ₹<span id="minAmount"></span> - ₹<span id="maxAmount"></span></p>
+                  </div>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="loanAmount" class="form-label fw-semibold">Loan Amount (₹) *</label>
+                  <input type="number" id="loanAmount" class="form-control" th:field="*{loanAmount}" 
+                         placeholder="Enter amount" step="1000" min="1000" required />
+                </div>
+                
+                <div class="mb-4">
+                  <label for="tenure" class="form-label fw-semibold">Loan Tenure (Months) *</label>
+                  <select id="tenure" class="form-select" th:field="*{tenure}" required>
+                    <option value="">-- Choose tenure --</option>
+                    <option value="6">6 months</option>
+                    <option value="12">12 months</option>
+                    <option value="24">24 months</option>
+                    <option value="36">36 months</option>
+                    <option value="48">48 months</option>
+                    <option value="60">60 months</option>
+                  </select>
+                </div>
+                
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary" id="submitBtn" th:disabled="${customer.kycStatus.name() == 'PENDING'}">
+                    <i class="bi bi-check-circle me-2"></i>Submit Application
+                  </button>
+                  <a th:href="@{/customer/dashboard}" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function showProductInfo(select) {
+      const option = select.options[select.selectedIndex];
+      if (option.value) {
+        document.getElementById('rate').textContent = option.getAttribute('data-rate');
+        document.getElementById('minAmount').textContent = parseFloat(option.getAttribute('data-min')).toLocaleString();
+        document.getElementById('maxAmount').textContent = parseFloat(option.getAttribute('data-max')).toLocaleString();
+        document.getElementById('productInfo').classList.add('active');
+      } else {
+        document.getElementById('productInfo').classList.remove('active');
+      }
+    }
+    
+    function validateForm() {
+      const productId = document.getElementById('loanProductId').value;
+      const amount = document.getElementById('loanAmount').value;
+      const tenure = document.getElementById('tenure').value;
+      
+      if (!productId) {
+        alert('Please select a loan product');
+        return false;
+      }
+      
+      if (!amount || amount <= 0) {
+        alert('Please enter a valid loan amount');
+        return false;
+      }
+      
+      if (!tenure) {
+        alert('Please select a loan tenure');
+        return false;
+      }
+      
+      const option = document.getElementById('loanProductId').options[document.getElementById('loanProductId').selectedIndex];
+      const minAmount = parseFloat(option.getAttribute('data-min'));
+      const maxAmount = parseFloat(option.getAttribute('data-max'));
+      
+      if (amount < minAmount || amount > maxAmount) {
+        alert('Loan amount must be between ₹' + minAmount.toLocaleString() + ' and ₹' + maxAmount.toLocaleString());
+        return false;
+      }
+      
+      return true;
+    }
+    
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const mainContent = document.getElementById('mainContent');
+    const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+    
+    function closeSidebar() {
+      sidebar.classList.remove('show');
+      overlay.classList.remove('show');
+      mainContent.classList.remove('shifted');
+    }
+    
+    hamburgerBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('show');
+      overlay.classList.toggle('show');
+      mainContent.classList.toggle('shifted');
+    });
+    
+    overlay.addEventListener('click', closeSidebar);
+    
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', closeSidebar);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Loans - Nirmala Bank</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #0b2a6b;
+      --secondary-color: #4f5b7d;
+      --background-color: #f8f9fa;
+      --border-color: #e9ecef;
+      --text-dark: #212529;
+      --text-light: #f8f9fa;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-dark);
+    }
+    .topbar {
+      background-color: var(--primary-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .topbar .navbar-brand {
+      color: var(--text-light);
+      transition: color 0.2s;
+    }
+    .topbar .navbar-brand:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .hamburger-menu {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      margin-right: 1rem;
+      transition: color 0.2s;
+    }
+    .hamburger-menu:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .sidebar {
+      min-height: 100vh;
+      background: #fff;
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      top: 56px;
+      left: -240px;
+      width: 240px;
+      padding-top: 2rem;
+      z-index: 1000;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+      transition: left 0.3s ease-in-out;
+    }
+    .sidebar.show {
+      left: 0;
+    }
+    .sidebar .nav-item {
+      padding: 0 1rem;
+    }
+    .sidebar .nav-link {
+      color: var(--secondary-color);
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      transition: background 0.2s, color 0.2s, font-weight 0.2s;
+      padding: 0.75rem 1rem;
+    }
+    .sidebar .nav-link.active,
+    .sidebar .nav-link:hover {
+      background: rgba(13, 110, 253, 0.1);
+      color: #0d6efd;
+      font-weight: 600;
+    }
+    .main-content {
+      margin-left: 0;
+      padding-top: 80px;
+      min-height: calc(100vh - 80px);
+      transition: margin-left 0.3s ease-in-out;
+    }
+    .main-content.shifted {
+      margin-left: 240px;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    }
+    .overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .card {
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <nav class="navbar navbar-expand shadow-sm sticky-top topbar">
+    <div class="container-fluid">
+      <button class="hamburger-menu" id="hamburgerBtn">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand fw-semibold" href="#">NIRMALA BANK</a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <div class="dropdown" style="margin-right: 30px;">
+          <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="profileMenu" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle fs-3 text-white me-2"></i>
+            <span class="d-none d-sm-inline text-white me-2">Profile</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" th:href="@{/customer/profile}">View Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="dropdown-item">Sign out</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="overlay" id="overlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/dashboard}"><i class="bi bi-house-door me-2"></i>Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/apply-loan}"><i class="bi bi-cash-coin me-2"></i>Apply Loans</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" th:href="@{/customer/my-loans}"><i class="bi bi-card-checklist me-2"></i>View Loans</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/repayments}"><i class="bi bi-credit-card me-2"></i>Repayments</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/report}"><i class="bi bi-file-text me-2"></i>Report</a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="main-content py-3" id="mainContent">
+    <div class="container-fluid py-5">
+    <h2 class="mb-4">My Loan Applications</h2>
+    <div th:if="${#lists.isEmpty(applications)}" class="alert alert-info">
+      No loan applications found. <a th:href="@{/customer/apply-loan}">Apply for a loan</a>
+    </div>
+    <div th:if="${!#lists.isEmpty(applications)}" class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Application ID</th>
+            <th>Loan Product</th>
+            <th>Amount</th>
+            <th>Tenure</th>
+            <th>Application Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="app : ${applications}">
+            <td th:text="${app.applicationId}"></td>
+            <td th:text="${app.loanProduct.productName}"></td>
+            <td th:text="'₹' + ${#numbers.formatDecimal(app.loanAmount, 0, 'COMMA', 2, 'POINT')}"></td>
+            <td th:text="${app.tenure} + ' months'"></td>
+            <td th:text="${#temporals.format(app.applicationDate, 'dd-MMM-yyyy')}"></td>
+            <td>
+              <span th:if="${app.approvalStatus.name() == 'PENDING'}" class="badge bg-warning">Pending</span>
+              <span th:if="${app.approvalStatus.name() == 'APPROVED'}" class="badge bg-success">Approved</span>
+              <span th:if="${app.approvalStatus.name() == 'REJECTED'}" class="badge bg-danger">Rejected</span>
+            </td>
+            <td>
+              <a th:if="${app.approvalStatus.name() == 'APPROVED'}" 
+                 th:href="@{/customer/repayments/{id}(id=${app.applicationId})}" 
+                 class="btn btn-sm btn-primary">View Repayments</a>
+              <span th:if="${app.approvalStatus.name() != 'APPROVED'}" class="text-muted">-</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <a th:href="@{/customer/dashboard}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const mainContent = document.getElementById('mainContent');
+    const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+    
+    function closeSidebar() {
+      sidebar.classList.remove('show');
+      overlay.classList.remove('show');
+      mainContent.classList.remove('shifted');
+    }
+    
+    hamburgerBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('show');
+      overlay.classList.toggle('show');
+      mainContent.classList.toggle('shifted');
+    });
+    
+    overlay.addEventListener('click', closeSidebar);
+    
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', closeSidebar);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nirmala Bank - Customer Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #0b2a6b;
+      --secondary-color: #4f5b7d;
+      --background-color: #f8f9fa;
+      --border-color: #e9ecef;
+      --text-dark: #212529;
+      --text-light: #f8f9fa;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-dark);
+    }
+    .topbar {
+      background-color: var(--primary-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .topbar .navbar-brand {
+      color: var(--text-light);
+      transition: color 0.2s;
+    }
+    .topbar .navbar-brand:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .hamburger-menu {
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      margin-right: 1rem;
+      transition: color 0.2s;
+    }
+    .hamburger-menu:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .sidebar {
+      min-height: 100vh;
+      background: #fff;
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      top: 56px;
+      left: -240px;
+      width: 240px;
+      padding-top: 2rem;
+      z-index: 1000;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+      transition: left 0.3s ease-in-out;
+    }
+    .sidebar.show {
+      left: 0;
+    }
+    .sidebar .nav-item {
+      padding: 0 1rem;
+    }
+    .sidebar .nav-link {
+      color: var(--secondary-color);
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      transition: background 0.2s, color 0.2s, font-weight 0.2s;
+      padding: 0.75rem 1rem;
+    }
+    .sidebar .nav-link.active,
+    .sidebar .nav-link:hover {
+      background: rgba(13, 110, 253, 0.1);
+      color: #0d6efd;
+      font-weight: 600;
+    }
+    .main-content {
+      margin-left: 0;
+      padding-top: 80px;
+      min-height: calc(100vh - 80px);
+      transition: margin-left 0.3s ease-in-out;
+    }
+    .main-content.shifted {
+      margin-left: 240px;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    }
+    .overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    .card {
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+    }
+    .carousel-item img { height: 400px; object-fit: cover; }
+    .loan-card { transition: transform .3s; border:1px solid #ddd; }
+    .loan-card:hover { transform: translateY(-8px); box-shadow:0 6px 18px rgba(0,0,0,.2); }
+  </style>
+</head>
+<body class="bg-light">
+  <nav class="navbar navbar-expand shadow-sm sticky-top topbar">
+    <div class="container-fluid">
+      <button class="hamburger-menu" id="hamburgerBtn">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand fw-semibold" href="#">NIRMALA BANK</a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <div class="dropdown" style="margin-right: 30px;">
+          <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="profileMenu" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle fs-3 text-white me-2"></i>
+            <span class="d-none d-sm-inline text-white me-2">Profile</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" th:href="@{/customer/profile}">View Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="dropdown-item">Sign out</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="overlay" id="overlay"></div>
+  <nav class="sidebar" id="sidebar">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link active" th:href="@{/customer/dashboard}"><i class="bi bi-house-door me-2"></i>Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/apply-loan}"><i class="bi bi-cash-coin me-2"></i>Apply Loans</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/my-loans}"><i class="bi bi-card-checklist me-2"></i>View Loans</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/repayments}"><i class="bi bi-credit-card me-2"></i>Repayments</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/report}"><i class="bi bi-file-text me-2"></i>Report</a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="main-content py-3" id="mainContent">
+    <div class="container-fluid py-5">
+    <div id="heroCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="/assets/slide1.png" class="d-block w-100" alt="Home Loan">
+          <div class="carousel-caption">
+            <h1>Dream Home Awaits You</h1>
+            <p>Affordable EMIs with flexible tenures for your Home Loan</p>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <img src="/assets/slide2.png" class="d-block w-100" alt="Vehicle Loan">
+          <div class="carousel-caption">
+            <h1>Drive Your Dream Car</h1>
+            <p>Easy Vehicle Loans with quick approval process</p>
+          </div>
+        </div>
+        <div class="carousel-item">
+          <img src="/assets/slide3.png" class="d-block w-100" alt="Personal Loan">
+          <div class="carousel-caption">
+            <h1>Personal Loans Made Simple</h1>
+            <p>Quick personal loans for weddings, travel, or emergencies</p>
+          </div>
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+
+    <section class="text-center my-5">
+      <h2 class="mb-4">Our Loan Services</h2>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="card loan-card h-100">
+            <img src="/assets/home_loan_card.png" class="card-img-top" alt="Home Loan">
+            <div class="card-body">
+              <h5 class="card-title">Home Loan</h5>
+              <p class="text-success fw-bold">Starting @ 8.25% p.a.</p>
+              <a th:href="@{/customer/apply-loan}" class="btn btn-success">Apply Now</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card loan-card h-100">
+            <img src="/assets/personal_loan_card.png" class="card-img-top" alt="Personal Loan">
+            <div class="card-body">
+              <h5 class="card-title">Personal Loan</h5>
+              <p class="text-success fw-bold">Starting @ 10.50% p.a.</p>
+              <a th:href="@{/customer/apply-loan}" class="btn btn-success">Apply Now</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card loan-card h-100">
+            <img src="/assets/vechile_loan_card.png" class="card-img-top" alt="Vehicle Loan">
+            <div class="card-body">
+              <h5 class="card-title">Vehicle Loan</h5>
+              <p class="text-success fw-bold">Starting @ 9.00% p.a.</p>
+              <a th:href="@{/customer/apply-loan}" class="btn btn-success">Apply Now</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const mainContent = document.getElementById('mainContent');
+    const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+    
+    function closeSidebar() {
+      sidebar.classList.remove('show');
+      overlay.classList.remove('show');
+      mainContent.classList.remove('shifted');
+    }
+    
+    hamburgerBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('show');
+      overlay.classList.toggle('show');
+      mainContent.classList.toggle('shifted');
+    });
+    
+    overlay.addEventListener('click', closeSidebar);
+    
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', closeSidebar);
+    });
+  </script>
+</body>
+</html>

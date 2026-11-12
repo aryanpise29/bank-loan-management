@@ -1,0 +1,92 @@
+﻿# Maven / Java
+/target/
+/*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+
+# Build outputs
+/build/
+/out/
+/dist/
+
+# IDEs / Editors
+/.idea/
+/*.iml
+.vscode/
+.project
+.classpath
+.settings/
+.metadata/
+.factorypath
+
+# Maven wrapper (keep wrapper files if you use them) - do NOT ignore .mvn/wrapper if you want wrapper in repo
+# Local maven repository (usually in user home, not repo)
+/.mvn/repository/
+
+# Logs
+*.log
+logs/
+spring.log
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Environment / secrets / local overrides
+.env
+.env.*
+credentials.json
+secrets.json
+*.key
+*.pem
+*.crt
+*.p12
+*.jks
+keystore.*
+
+# Application local config (allow committed default application.properties, ignore local overrides)
+src/main/resources/application-*.local.properties
+src/main/resources/*.local.properties
+application-*.local.properties
+application.local.properties
+application-dev.properties
+
+# Test / coverage
+coverage/
+jacoco.exec
+*.coverage
+reports/
+
+# Static / frontend (if present)
+node_modules/
+npm-debug.log*
+yarn-error.log
+dist/
+build/
+
+# Databases / runtime files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.pid
+*.lock
+*.sock
+
+# Generated files / packages
+*.class
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.tgz
+
+# Misc
+.vscode-test/
+.idea/
+out/

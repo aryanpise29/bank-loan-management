@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Edit Profile - Nirmala Bank</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #0b2a6b;
+      --secondary-color: #4f5b7d;
+      --background-color: #f8f9fa;
+      --border-color: #e9ecef;
+      --text-dark: #212529;
+      --text-light: #f8f9fa;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-dark);
+    }
+    .topbar {
+      background-color: var(--primary-color);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .topbar .navbar-brand {
+      color: var(--text-light);
+      transition: color 0.2s;
+    }
+    .topbar .navbar-brand:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    .sidebar {
+      min-height: 100vh;
+      background: #fff;
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      top: 56px;
+      left: 0;
+      width: 240px;
+      padding-top: 2rem;
+      z-index: 100;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    }
+    .sidebar .nav-item {
+      padding: 0 1rem;
+    }
+    .sidebar .nav-link {
+      color: var(--secondary-color);
+      font-size: 1.05rem;
+      margin-bottom: 0.5rem;
+      border-radius: 0.5rem;
+      transition: background 0.2s, color 0.2s, font-weight 0.2s;
+      padding: 0.75rem 1rem;
+    }
+    .sidebar .nav-link.active,
+    .sidebar .nav-link:hover {
+      background: rgba(13, 110, 253, 0.1);
+      color: #0d6efd;
+      font-weight: 600;
+    }
+    .main-content {
+      margin-left: 260px;
+      padding-top: 80px;
+      min-height: calc(100vh - 80px);
+    }
+    .card {
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <nav class="navbar navbar-expand shadow-sm sticky-top topbar">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-semibold" href="#" style="margin-left: 20px;">NIRMALA BANK</a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <div class="dropdown" style="margin-right: 30px;">
+          <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#" id="profileMenu" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle fs-3 text-white me-2"></i>
+            <span class="d-none d-sm-inline text-white me-2">Profile</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" th:href="@{/customer/profile}">View Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit" class="dropdown-item">Sign out</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <nav class="sidebar">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/dashboard}"><i class="bi bi-house-door me-2"></i>Dashboard</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/apply-loan}"><i class="bi bi-cash-coin me-2"></i>Apply Loans</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/my-loans}"><i class="bi bi-card-checklist me-2"></i>View Loans</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/repayments}"><i class="bi bi-credit-card me-2"></i>Repayments</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" th:href="@{/customer/report}"><i class="bi bi-file-text me-2"></i>Report</a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="main-content py-3">
+    <div class="container-fluid py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <div class="card card-hover shadow-sm rounded-4 border-0">
+            <div class="card-body p-4">
+              <h2 class="card-title mb-4 fw-bold">Edit Profile</h2>
+              
+              <div th:if="${param.success}" class="alert alert-success">
+                <i class="bi bi-check-circle me-2"></i>Profile updated successfully!
+              </div>
+              
+              <div th:if="${param.error}" class="alert alert-danger">
+                <i class="bi bi-exclamation-circle me-2"></i>Failed to update profile. Please try again.
+              </div>
+              
+              <form th:action="@{/customer/edit-profile}" method="post" th:object="${customerRequest}">
+                <div class="mb-3">
+                  <label for="name" class="form-label fw-semibold">Full Name *</label>
+                  <input type="text" id="name" class="form-control" th:field="*{name}" placeholder="Enter your full name" required />
+                </div>
+                
+                <div class="mb-3">
+                  <label for="email" class="form-label fw-semibold">Email *</label>
+                  <input type="email" id="email" class="form-control" th:field="*{email}" placeholder="Enter your email" required readonly />
+                  <small class="text-muted">Email cannot be changed</small>
+                </div>
+                
+                <div class="mb-3">
+                  <label for="phone" class="form-label fw-semibold">Phone Number *</label>
+                  <input type="text" id="phone" class="form-control" th:field="*{phone}" placeholder="Enter your phone number" required />
+                </div>
+                
+                <div class="mb-4">
+                  <label for="address" class="form-label fw-semibold">Address *</label>
+                  <textarea id="address" class="form-control" th:field="*{address}" placeholder="Enter your address" rows="3" required></textarea>
+                </div>
+                
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-2"></i>Update Profile
+                  </button>
+                  <a th:href="@{/customer/dashboard}" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Cancel
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+
+
+
